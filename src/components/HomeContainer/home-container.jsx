@@ -3,6 +3,8 @@ import React from "react";
 import Bike from "../../assets/delivery.png";
 import Hero from "../../assets/heroBg.png";
 
+import { heroData } from "../../utils/heroData";
+
 function HomeContainer() {
   return (
     <section id="home" className="grid grid-cols-1 md:grid-cols-2 gap-2 w-full">
@@ -46,8 +48,30 @@ function HomeContainer() {
           className="h-420 w-full lg:h-650 lg:w-auto ml-auto"
           alt="hero background"
         />
-        <div className="w-full h-full absolute top-0 left-0 flex items-center justify-center px-32 py-4">
-          <div className="w-190 p-2 bg-cardOverlay backdrop-blur-md"></div>
+        <div className="w-full h-full absolute top-0 left-0 flex-wrap gap-2 flex items-center justify-center lg:px-28 py-4">
+          {heroData &&
+            heroData.map((item) => (
+              <div
+                key={item.id}
+                className="lg:w-190 p-4 bg-cardOverlay backdrop-blur-md rounded-3xl flex flex-col items-center justify-center drop-shadow-lg"
+              >
+                <img
+                  src={item.imgSrc}
+                  className="lg:w-40 w-20 -mt-10 lg:-mt-20"
+                  alt="ice cream"
+                />
+                <p className="text-base lg:text-xl mt-4 font-semibold text-textColor">
+                  {item.name}
+                </p>
+                <p className="text-sm text-lightTextGray font-semibold my-2">
+                  {item.description}
+                </p>
+                <p className="text-sm font-semibold text-headingColor">
+                  <span className="text-xs text-red-600">Ksh.</span>{" "}
+                  {item.price}
+                </p>
+              </div>
+            ))}
         </div>
       </div>
     </section>
