@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 
+import { storage } from "../../firebase/firebase.config";
+
 import {
   MdFastfood,
   MdCloudUpload,
@@ -11,6 +13,13 @@ import {
 
 import { categories } from "../../utils/heroData";
 import Loader from "../Loader/loader";
+import {
+  deleteObject,
+  getDownloadURL,
+  ref,
+  uploadBytesResumable,
+} from "firebase/storage";
+import { saveItem } from "../../utils/firebaseFunctions";
 
 function CreateContainer() {
   const [title, setTitle] = useState("");
@@ -23,11 +32,113 @@ function CreateContainer() {
   const [msg, setMsg] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  const uploadImage = () => {};
+  // upload image to firebase storage
+  const uploadImage = (e) => {
+    setIsLoading(true);
+    const imageFile = e.target.files[0];
 
-  const deleteImage = () => {};
+    const storageRef = ref(storage, `Images/${Date.now()}-${imageFile.name}`); // firebase storage reference
+    const uploadTask = uploadBytesResumable(storageRef, imageFile); // this is the storage reference and what file you want to store in there
 
-  const saveDetails = () => {};
+    uploadTask.on(
+      "state_changed",
+      (snapshot) => {
+        const uploadProgress =
+          (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+      },
+      (error) => {
+        console.log("Error: ", error);
+        setFields(true);
+        setMsg("Error while uploading. Try Again!!!");
+        setAlertStatus("danger");
+        setTimeout(() => {
+          setFields(false);
+          setIsLoading(false);
+        }, 4000);
+      },
+      () => {
+        getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+          setImageAsset(downloadURL);
+          setIsLoading(false);
+          setFields(true);
+          setMsg("Image Uploaded Successfully!!");
+          setAlertStatus("success");
+          setTimeout(() => {
+            setFields(false);
+          }, 4000);
+        });
+      }
+    );
+  };
+
+  // delete image from firebase storage
+  const deleteImage = () => {
+    setIsLoading(true);
+    const deleteRef = ref(storage, imageAsset);
+    deleteObject(deleteRef).then(() => {
+      setImageAsset(null);
+      setIsLoading(false);
+      setFields(true);
+      setMsg("Image Deleted Successfully!!");
+      setAlertStatus("success");
+      setTimeout(() => {
+        setFields(false);
+      }, 4000);
+    });
+  };
+
+  // saving user input to firebase firestore
+  const saveDetails = () => {
+    setIsLoading(true);
+    try {
+      if (!title || !calories || !imageAsset || !price || !category) {
+        setFields(true);
+        setMsg("Required fields must be filled. Try Again!!!");
+        setAlertStatus("danger");
+        setTimeout(() => {
+          setFields(false);
+          setIsLoading(false);
+        }, 4000);
+      } else {
+        const data = {
+          id: `${Date.now()}`,
+          title: title,
+          imageURL: imageAsset,
+          category: category,
+          calories: calories,
+          qty: 1,
+          price: price,
+        };
+
+        saveItem(data);
+        setIsLoading(false);
+        setFields(true);
+        setMsg("Data Uploaded Successfully!!");
+        clearData();
+        setAlertStatus("success");
+        setTimeout(() => {
+          setFields(false);
+        }, 4000);
+      }
+    } catch (error) {
+      console.log("Error: ", error);
+      setFields(true);
+      setMsg("Error while uploading. Try Again!!!");
+      setAlertStatus("danger");
+      setTimeout(() => {
+        setFields(false);
+        setIsLoading(false);
+      }, 4000);
+    }
+  };
+
+  const clearData = () => {
+    setTitle("");
+    setImageAsset(null);
+    setCalories("");
+    setPrice("");
+    setCategory("Select Category");
+  };
 
   return (
     <div className="w-full min-h-screen flex items-center justify-center">
@@ -59,7 +170,7 @@ function CreateContainer() {
         </div>
         <div className="w-full">
           <select
-            ocnChange={(e) => setCategory(e.target.value)}
+            onChange={(e) => setCategory(e.target.value)}
             className="outline-none w-full text-base border-b-2 border-gray-200 p-2 rounded-md cursor-pointer"
           >
             <option value="other" className="bg-white">
@@ -106,7 +217,7 @@ function CreateContainer() {
                     <img
                       src={imageAsset}
                       className="w-full h-full object-cover"
-                      alt="Uploaded image"
+                      alt="Uploaded pic"
                     />
                     <button
                       type="button"

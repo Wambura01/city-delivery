@@ -102,6 +102,7 @@ function Header() {
               src={user ? user.photoURL : Avatar}
               className="w-10 min-w-[40px] min-h-[40px] drop-shadow-xl cursor-pointer rounded-full"
               alt="userprofile"
+              referrerPolicy="no-referrer"
               onClick={login}
             />
           </div>
@@ -151,7 +152,7 @@ function Header() {
             src={user ? user.photoURL : Avatar}
             className="w-10 min-w-[40px] min-h-[40px] drop-shadow-xl cursor-pointer rounded-full"
             alt="userprofile"
-            rel="no-referrer"
+            referrerPolicy="no-referrer"
             onClick={login}
           />
         </div>
