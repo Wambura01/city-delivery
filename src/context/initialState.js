@@ -4,4 +4,5 @@ const userInfo = fetchUser(); // user info from local storage
 
 export const initialState = {
   user: userInfo,
+  foodItems: null,
 };
