@@ -3,6 +3,10 @@ import { motion } from "framer-motion";
 
 import { storage } from "../../firebase/firebase.config";
 
+import { useStateValue } from "../../context/stateContext";
+import { getAllFoodItems } from "../../utils/firebaseFunctions";
+import { actionType } from "../../context/reducer";
+
 import {
   MdFastfood,
   MdCloudUpload,
@@ -31,6 +35,7 @@ function CreateContainer() {
   const [alertStatus, setAlertStatus] = useState("danger");
   const [msg, setMsg] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [{ foodItems }, dispatch] = useStateValue();
 
   // upload image to firebase storage
   const uploadImage = (e) => {
@@ -130,6 +135,8 @@ function CreateContainer() {
         setIsLoading(false);
       }, 4000);
     }
+
+    fetchData();
   };
 
   const clearData = () => {
@@ -138,6 +145,15 @@ function CreateContainer() {
     setCalories("");
     setPrice("");
     setCategory("Select Category");
+  };
+
+  const fetchData = async () => {
+    await getAllFoodItems().then((data) =>
+      dispatch({
+        type: actionType.SET_FOOD_ITEMS,
+        foodItems: data,
+      })
+    );
   };
 
   return (
