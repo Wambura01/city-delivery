@@ -1,31 +1,45 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 
 import { MdShoppingBasket } from "react-icons/md";
 
-function RowContainer({ flag, data }) {
+import NotFound from "../../assets/NotFound.svg";
+
+function RowContainer({ flag, data, scroll }) {
   console.log(data);
+
+  const rowContainer = useRef();
+
+  useEffect(() => {
+    rowContainer.current.scrollLeft += scroll;
+  }, [scroll]);
+
   return (
     <div
-      className={`w-full flex items-center my-12 ${
+      ref={rowContainer}
+      className={`w-full flex items-center my-12 scroll-smooth ${
         flag
           ? "overflow-x-scroll scrollbar-none"
-          : "overflow-x-hidden flex-wrap"
+          : "overflow-x-hidden flex-wrap justify-center"
       }`}
     >
-      {data &&
+      {data && data.length > 0 ? (
         data.map((item) => (
           <div
-            ey={item.id}
-            className="w-300 min-w-[300px] md:w-340 md:min-w-[340px] gap-3 h-auto bg-cardOverlay rounded-lg p-2 my-12 backdrop-blur-lg hover:drop-shadow-lg"
+            ey={item?.id}
+            className="w-300 h-auto min-w-[300px] md:w-340 md:min-w-[340px] gap-3 flex flex-col items-center justify-between bg-cardOverlay rounded-lg p-2 my-12 md:ml-3 backdrop-blur-lg hover:drop-shadow-lg"
           >
             <div className="w-full flex items-center justify-between">
-              <motion.img
+              <motion.div
                 whileHover={{ scale: 1.2 }}
-                className="w-40 -mt-8 drop-shadow-2xl"
-                src="https://firebasestorage.googleapis.com/v0/b/city-delivery-1f074.appspot.com/o/Images%2F1658750060620-i1.png?alt=media&token=5767c1d4-8164-4e38-8bec-3b7a0e58faf8"
-                alt="food or drink"
-              />
+                className="w-40 h-40 -mt-8 drop-shadow-2xl"
+              >
+                <img
+                  className="w-full h-full object-contain"
+                  src={item?.imageURL}
+                  alt="food or drink"
+                />
+              </motion.div>
               <motion.div
                 whileTap={{ scale: 0.75 }}
                 className="w-8 h-8 rounded-full bg-red-600 cursor-pointer hover:shadow-md flex items-center justify-center"
@@ -35,17 +49,28 @@ function RowContainer({ flag, data }) {
             </div>
             <div className="w-full flex flex-col items-end justify-end">
               <p className="text-textColor font-semibold text-base md:text-lg">
-                Chocolate Vanilla
+                {item?.title}
               </p>
-              <p className="mt-1 text-sm text-gray-500">45 Calories</p>
+              <p className="mt-1 text-sm text-gray-500">
+                {item?.calories} Calories
+              </p>
               <div className="flex items-center gap-8">
                 <p className="text-lg text-headingColor font-semibold">
-                  <span className="text-sm text-red-500">Ksh. </span>550
+                  <span className="text-sm text-red-500">Ksh. </span>
+                  {item?.price}
                 </p>
               </div>
             </div>
           </div>
-        ))}
+        ))
+      ) : (
+        <div className="w-full flex flex-col items-center justify-center">
+          <img src={NotFound} alt="Not Found" className="h-340" />
+          <p className="text-xl text-headingColor font-semibold my-2">
+            Items not Available!!
+          </p>
+        </div>
+      )}
     </div>
   );
 }
