@@ -2,7 +2,13 @@ import React, { useEffect } from "react";
 import { Routes, Route } from "react-router-dom";
 import { AnimatePresence } from "framer-motion";
 
-import { Header, CreateContainer, MainContainer } from "./components";
+import {
+  Header,
+  CreateContainer,
+  MainContainer,
+  Login,
+  Register,
+} from "./components";
 import { useStateValue } from "./context/stateContext";
 import { getAllFoodItems } from "./utils/firebaseFunctions";
 import { actionType } from "./context/reducer";
@@ -29,6 +35,8 @@ function App() {
         <Header />
         <main className="mt-14 md:mt-20 md:px-16 px-4 py-4 w-full">
           <Routes>
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
             <Route path="/*" element={<MainContainer />}></Route>
             <Route path="/createItem" element={<CreateContainer />}></Route>
           </Routes>
