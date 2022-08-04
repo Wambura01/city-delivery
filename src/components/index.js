@@ -7,3 +7,5 @@ export { default as RowContainer } from "./RowContainer/row-container";
 export { default as MenuContainer } from "./MenuContainer/menu-container";
 export { default as CartContainer } from "./CartContainer/cart-container";
 export { default as CartItem } from "./CartItem/cart-item";
+export { default as Login } from "./Login/login";
+export { default as Register } from "./Login/register";

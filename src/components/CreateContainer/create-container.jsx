@@ -252,7 +252,7 @@ function CreateContainer() {
           <div className="w-full py-2 border-b border-gray-300 flex items-center gap-2">
             <MdFoodBank className="text-gray-700 text-2xl" />
             <input
-              type="text"
+              type="number"
               required
               value={calories}
               onChange={(e) => setCalories(e.target.value)}
@@ -265,7 +265,7 @@ function CreateContainer() {
           <div className="w-full py-2 border-b border-gray-300 flex items-center gap-2">
             <MdAttachMoney className="text-gray-700 text-2xl" />
             <input
-              type="text"
+              type="number"
               required
               value={price}
               onChange={(e) => setPrice(e.target.value)}

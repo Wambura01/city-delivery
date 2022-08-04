@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 
 import { MdOutlineKeyboardBackspace } from "react-icons/md";
@@ -10,8 +10,12 @@ import { actionType } from "../../context/reducer";
 import EmptyCart from "../../assets/emptyCart.svg";
 import CartItem from "../CartItem/cart-item";
 
+import { saveOrder } from "../../utils/firebaseFunctions";
+
 function CartContainer() {
   const [{ cartShow, cartItems, user }, dispatch] = useStateValue();
+  const [total, setTotal] = useState(0);
+  const [flag, setFlag] = useState(1);
 
   // show cart
   const showCart = () => {
@@ -19,6 +23,37 @@ function CartContainer() {
       type: actionType.SET_CART_SHOW,
       cartShow: !cartShow,
     });
+  };
+
+  // calculate totals
+  useEffect(() => {
+    let totalPrice = cartItems.reduce(function (accumulator, item) {
+      return accumulator + item.qty * item.price;
+    }, 0);
+    setTotal(totalPrice);
+  }, [total, flag]);
+
+  const clearCart = () => {
+    dispatch({
+      type: actionType.SET_CART_ITEMS,
+      cartItems: [],
+    });
+
+    localStorage.setItem("cartItems", JSON.stringify([]));
+  };
+
+  // upload order
+  const uploadOrder = () => {
+    saveOrder(Object.assign({}, cartItems));
+    console.log("cart items", cartItems);
+  };
+
+  const handleCheckout = () => {
+    uploadOrder();
+    alert(
+      "Thank you for placing an order with us. Call 071200xxxx for payment and delivery details. Enjoy!"
+    );
+    clearCart();
   };
 
   return (
@@ -36,6 +71,7 @@ function CartContainer() {
         <motion.p
           whileTap={{ scale: 0.75 }}
           className="flex items-center gap-2 p-1 px-2 my-2 bg-gray-100 rounded-md hover:shadow-md cursor-pointer text-textColor text-base"
+          onClick={clearCart}
         >
           Clear <RiRefreshFill />
         </motion.p>
@@ -44,12 +80,19 @@ function CartContainer() {
         <div className="w-full h-full bg-cartBg rounded-t-[2rem] flex flex-col">
           <div className="w-full h-340 md:h-42 px-6 py-10 flex flex-col gap-3 overflow-y-scroll scrollbar-none">
             {cartItems &&
-              cartItems.map((item) => <CartItem key={item.id} item={item} />)}
+              cartItems.map((item) => (
+                <CartItem
+                  key={item.id}
+                  item={item}
+                  setFlag={setFlag}
+                  flag={flag}
+                />
+              ))}
           </div>
           <div className="w-full flex-1 bg-cartTotal rounded-t-[2rem] flex flex-col items-center justify-evenly px-8 py-2">
             <div className="w-full flex items-center justify-between">
               <p className="text-gray-400 text-lg">Sub Total</p>
-              <p className="text-gray-400 text-lg">Ksh. 980</p>
+              <p className="text-gray-400 text-lg">Ksh. {total}</p>
             </div>
             <div className="w-full flex items-center justify-between">
               <p className="text-gray-400 text-lg">Delivery</p>
@@ -58,12 +101,15 @@ function CartContainer() {
             <div className="w-full border-b border-gray-600 my-2"></div>
             <div className="w-full flex items-center justify-between">
               <p className="text-gray-200 text-xl font-semibold">Total</p>
-              <p className="text-gray-200 text-xl font-semibold">Ksh. 1080</p>
+              <p className="text-gray-200 text-xl font-semibold">
+                Ksh. {total + 100}
+              </p>
             </div>
             {user ? (
               <motion.button
                 whileTap={{ scale: 0.8 }}
                 type="button"
+                onClick={handleCheckout}
                 className="w-full rounded-full bg-red-600 text-gray-50 text-lg my-2 hover:shadow-lg"
               >
                 Check Out

@@ -1,7 +1,5 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
-import { getAuth, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
-import { app } from "../../firebase/firebase.config";
+import { Link, useNavigate } from "react-router-dom";
 
 import { motion } from "framer-motion";
 
@@ -14,30 +12,10 @@ import Logo from "../../assets/logo.png";
 import Avatar from "../../assets/avatar.png";
 
 function Header() {
-  const auth = getAuth(app); // initializing firebase authentication
-  const provider = new GoogleAuthProvider(); // initializing the auth provider
-
   const [{ user, cartShow, cartItems }, dispatch] = useStateValue();
 
   const [isMenu, setIsMenu] = useState(false);
-
-  // login with google popup
-  const login = async () => {
-    if (!user) {
-      const {
-        user: { refreshToken, providerData },
-      } = await signInWithPopup(auth, provider);
-      dispatch({
-        type: actionType.SET_USER,
-        user: providerData[0],
-      });
-
-      // saving user in local storage to persist user
-      localStorage.setItem("user", JSON.stringify(providerData[0]));
-    } else {
-      setIsMenu(!isMenu);
-    }
-  };
+  let navigate = useNavigate();
 
   // logout user
   const logout = () => {
@@ -48,6 +26,8 @@ function Header() {
       type: actionType.SET_USER,
       user: null,
     });
+
+    navigate("/login", { replace: true });
   };
 
   // show cart
@@ -118,7 +98,7 @@ function Header() {
               className="w-10 min-w-[40px] min-h-[40px] drop-shadow-xl cursor-pointer rounded-full"
               alt="userprofile"
               referrerPolicy="no-referrer"
-              onClick={login}
+              onClick={() => setIsMenu(!isMenu)}
             />
           </div>
           {isMenu && (
@@ -175,7 +155,7 @@ function Header() {
             className="w-10 min-w-[40px] min-h-[40px] drop-shadow-xl cursor-pointer rounded-full"
             alt="userprofile"
             referrerPolicy="no-referrer"
-            onClick={login}
+            onClick={() => setIsMenu(!isMenu)}
           />
         </div>
         {isMenu && (
