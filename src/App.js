@@ -12,6 +12,7 @@ import {
 import { useStateValue } from "./context/stateContext";
 import { getAllFoodItems } from "./utils/firebaseFunctions";
 import { actionType } from "./context/reducer";
+import Portal from "./components/Portal/portal";
 
 function App() {
   const [{ foodItems }, dispatch] = useStateValue();
@@ -39,6 +40,7 @@ function App() {
             <Route path="/register" element={<Register />} />
             <Route path="/*" element={<MainContainer />}></Route>
             <Route path="/createItem" element={<CreateContainer />}></Route>
+            <Route path="/portal" element={<Portal />}></Route>
           </Routes>
         </main>
       </div>
